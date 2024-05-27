@@ -4,24 +4,32 @@ import { Button } from "@/components/ui/button";
 import { API_ENDPOINT_FOR_MESSAGE } from "@/lib/constants";
 import axios from "axios";
 import { useRef, useEffect, useState, use } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
+import { addMessage } from "@/redux/chatHistorySlice";
 
 const MainSection = () => {
+  const dispatch = useDispatch();
   const chatHistory = useSelector((state: RootState) => state.chatHistory);
+  const [fetchingResponse, setFetchingResponse] = useState(false);
 
   const chatTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     const msg = chatTextAreaRef.current?.value;
-    console.log("msg = ", msg);
+    if (!msg) return;
+    chatTextAreaRef.current!.value = "";
+    dispatch(addMessage({ role: "user", text: msg }));
+    setFetchingResponse(true);
     const response = await axios.post(API_ENDPOINT_FOR_MESSAGE, {
       history: chatHistory,
       message: msg,
     });
+    setFetchingResponse(false);
+    dispatch(addMessage({ role: "model", text: response.data }));
+
     console.log(response.data);
-    // setChatHistory([response.data.history]);
   };
 
   return (
@@ -48,6 +56,11 @@ const MainSection = () => {
               </div>
             );
           })}
+          {fetchingResponse && (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          )}
         </div>
         <div className="p-10 bg-gray-600 fixed bottom-0 left-[20%] w-[80%]">
           <form onSubmit={handleSendMessage} className="flex opacity-100">
