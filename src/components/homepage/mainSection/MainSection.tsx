@@ -70,6 +70,38 @@ const MainSection = () => {
         },
       ],
     },
+    {
+      role: "model",
+      parts: [
+        {
+          text: "What is the use of isNaN function?",
+        },
+      ],
+    },
+    {
+      role: "user",
+      parts: [
+        {
+          text: "The isNaN function is used to determine whether a value is an illegal number (Not-a-Number). This function returns true if the value equates to NaN; otherwise, it returns false.",
+        },
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {
+          text: "What is the use of isNaN function?",
+        },
+      ],
+    },
+    {
+      role: "user",
+      parts: [
+        {
+          text: "The isNaN function is used to determine whether a value is an illegal number (Not-a-Number). This function returns true if the value equates to NaN; otherwise, it returns false.",
+        },
+      ],
+    },
   ];
   const [chatHistory, setChatHistory] = useState<History>(presetHistory);
 
@@ -93,8 +125,8 @@ const MainSection = () => {
 
   return (
     <MainSectionContainer>
-      <div className="flex flex-col justify-between h-full">
-        <div className="p-10">
+      <div className="">
+        <div className="p-10 min-h-screen pb-32 flex flex-col justify-end">
           {chatHistory.map((messageObj, index) => {
             // console.log("msg obj = ", messageObj);
             const role = messageObj.role;
@@ -116,8 +148,8 @@ const MainSection = () => {
             );
           })}
         </div>
-        <div className="p-10 bg-gray-600">
-          <form onSubmit={handleSendMessage} className="flex">
+        <div className="p-10 bg-gray-600 fixed bottom-0 left-[20%] w-[80%]">
+          <form onSubmit={handleSendMessage} className="flex opacity-100">
             <textarea
               // onChange={handleMessageChange}
               className="border w-full resize-none"
@@ -133,7 +165,7 @@ const MainSection = () => {
 };
 
 const MainSectionContainer = ({ children }: { children: React.ReactNode }) => {
-  return <div className="col-span-5 h-full">{children}</div>;
+  return <div className="col-span-8">{children}</div>;
 };
 
 export default MainSection;
