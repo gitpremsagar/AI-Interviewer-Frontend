@@ -35,7 +35,7 @@ const MainSection = () => {
   return (
     <MainSectionContainer>
       <div className="">
-        <div className="p-10 min-h-screen pb-32 flex flex-col justify-end">
+        <div className="p-10 min-h-screen py-32 flex flex-col justify-end">
           {chatHistory.map((messageObj, index) => {
             // console.log("msg obj = ", messageObj);
             const role = messageObj.role;
