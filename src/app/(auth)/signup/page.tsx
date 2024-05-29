@@ -3,8 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { BiLoaderAlt } from "react-icons/bi";
 import {
   Form,
   FormControl,
@@ -15,6 +16,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { API_ENDPOINT_FOR_USER } from "@/lib/constants";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -44,8 +48,11 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-function SignupForm() {
-  // 1. Define your form.
+function SignupPage() {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,10 +65,24 @@ function SignupForm() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(formData: z.infer<typeof formSchema>) {
+    // console.log(formData);
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.post(`${API_ENDPOINT_FOR_USER}`, formData);
+
+      if (response.status === 201) {
+        router.push("/signup/success");
+      }
+      // console.log(response.data);
+    } catch (error: any) {
+      console.log(error.response.data.message);
+      setLoading(false);
+      if (error.response.data.message === "User already exists") {
+        setError("User already exists");
+      } else setError("An error occurred. Please try again.");
+    }
   }
 
   return (
@@ -146,11 +167,22 @@ function SignupForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button disabled={loading} type="submit">
+            {loading ? (
+              <>
+                <BiLoaderAlt className="animate-spin" /> Signing Up
+              </>
+            ) : (
+              "Submit"
+            )}
+          </Button>
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
         </form>
       </Form>
     </div>
   );
 }
 
-export default SignupForm;
+export default SignupPage;
