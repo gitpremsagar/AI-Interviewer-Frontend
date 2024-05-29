@@ -170,10 +170,10 @@ function SignupPage() {
           <Button disabled={loading} type="submit">
             {loading ? (
               <>
-                <BiLoaderAlt className="animate-spin" /> Signing Up
+                <BiLoaderAlt className="animate-spin" /> Signing Up...
               </>
             ) : (
-              "Submit"
+              "Sign Up"
             )}
           </Button>
           {error && (

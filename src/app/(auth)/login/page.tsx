@@ -15,6 +15,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { BiLoaderAlt } from "react-icons/bi";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { API_ENDPOINT_FOR_USER } from "@/lib/constants";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -24,7 +29,11 @@ const formSchema = z.object({
 });
 
 function LoginForm() {
-  // 1. Define your form.
+  const router = useRouter();
+
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,11 +42,26 @@ function LoginForm() {
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(loginFormData: z.infer<typeof formSchema>) {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.post(
+        `${API_ENDPOINT_FOR_USER}/login`,
+        loginFormData
+      );
+
+      if (response.status === 200) {
+        router.push("/");
+      }
+    } catch (error: any) {
+      console.log(error.response.data.message);
+      setLoading(false);
+      if (error.response.data.message === "invalid email or password") {
+        setError("Invalid email or password");
+      } else setError("Something went wrong");
+    }
   }
 
   return (
@@ -74,7 +98,18 @@ function LoginForm() {
             )}
           />
 
-          <Button type="submit">Submit</Button>
+          <Button disabled={loading} type="submit">
+            {loading ? (
+              <>
+                <BiLoaderAlt className="animate-spin" /> Loging In...
+              </>
+            ) : (
+              "Log In"
+            )}
+          </Button>
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
         </form>
       </Form>
     </div>
