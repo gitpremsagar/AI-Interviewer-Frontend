@@ -30,6 +30,7 @@ const formSchema = z.object({
 
 function LoginForm() {
   const router = useRouter();
+  axios.defaults.withCredentials = true;
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,6 +55,7 @@ function LoginForm() {
 
       if (response.status === 200) {
         router.push("/");
+        console.log(response.data);
       }
     } catch (error: any) {
       console.log(error.response.data.message);
@@ -98,7 +100,10 @@ function LoginForm() {
             )}
           />
 
-          <Button disabled={loading} type="submit">
+          <Button
+            // disabled={loading}
+            type="submit"
+          >
             {loading ? (
               <>
                 <BiLoaderAlt className="animate-spin" /> Loging In...
