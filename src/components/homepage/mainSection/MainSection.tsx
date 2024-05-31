@@ -2,13 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { API_ENDPOINT_FOR_MESSAGE } from "@/lib/constants";
-import axios from "axios";
+import customAxios from "@/lib/axiosInterceptor";
 import { useRef, useEffect, useState, use } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { addMessage } from "@/redux/chatHistorySlice";
+import { useRouter } from "next/navigation";
 
 const MainSection = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const chatHistory = useSelector((state: RootState) => state.chatHistory);
   const [fetchingResponse, setFetchingResponse] = useState(false);
@@ -22,14 +24,27 @@ const MainSection = () => {
     chatTextAreaRef.current!.value = "";
     dispatch(addMessage({ role: "user", text: msg }));
     setFetchingResponse(true);
-    const response = await axios.post(API_ENDPOINT_FOR_MESSAGE, {
-      history: chatHistory,
-      message: msg,
-    });
-    setFetchingResponse(false);
-    dispatch(addMessage({ role: "model", text: response.data }));
+    try {
+      const response = await customAxios.post(API_ENDPOINT_FOR_MESSAGE, {
+        history: chatHistory,
+        message: msg,
+        conversationId: "newConversation",
+      });
+      setFetchingResponse(false);
+      dispatch(
+        addMessage({ role: "model", text: response.data.geminiResponse })
+      );
 
-    console.log(response.data);
+      console.log(response.data);
+    } catch (error: any) {
+      if (error.response?.data?.message === "Refresh Token expired") {
+        router.push("/login");
+        // console.log("Access Token Expired");
+      } else {
+        console.error("error = ", error);
+        alert("something went wrong");
+      }
+    }
   };
 
   return (

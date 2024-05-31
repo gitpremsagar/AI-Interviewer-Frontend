@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import LandingPageHeader from "@/components/landingPage/Header/LandingPageHeader";
+import LandingPageFooter from "@/components/landingPage/footer/LandingPageFooter";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body className={`${inter.className} `}>
         <LandingPageHeader />
         {children}
+        <LandingPageFooter />
       </body>
     </html>
   );
