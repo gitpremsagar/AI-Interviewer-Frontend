@@ -4,7 +4,7 @@ import MainSection from "@/components/homepage/mainSection/MainSection";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useEffect } from "react";
-export default function Home() {
+export default function AiInterviewer() {
   const userDetail = useSelector((state: RootState) => state.user);
 
   useEffect(() => {

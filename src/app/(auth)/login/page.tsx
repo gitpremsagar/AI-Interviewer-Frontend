@@ -54,11 +54,11 @@ function LoginForm() {
       );
 
       if (response.status === 200) {
-        router.push("/");
+        router.push("/ai-interview");
         console.log(response.data);
       }
     } catch (error: any) {
-      console.log(error.response.data.message);
+      console.log("error while logging in = ", error);
       setLoading(false);
       if (error.response.data.message === "invalid email or password") {
         setError("Invalid email or password");
@@ -100,10 +100,7 @@ function LoginForm() {
             )}
           />
 
-          <Button
-            // disabled={loading}
-            type="submit"
-          >
+          <Button disabled={loading} type="submit">
             {loading ? (
               <>
                 <BiLoaderAlt className="animate-spin" /> Loging In...

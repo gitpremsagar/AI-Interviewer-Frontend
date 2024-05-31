@@ -2,14 +2,25 @@ import axios from "axios";
 import { API_ENDPOINT_FOR_USER } from "@/lib/constants";
 
 async function refreshAccessToken() {
+  axios.defaults.withCredentials = true;
   try {
-    await axios.post(`${API_ENDPOINT_FOR_USER}/refresh-access-token`, {
-      withCredentials: true,
-    });
-    return "refreshed";
+    await axios.post(`${API_ENDPOINT_FOR_USER}/refresh-access-token`);
+    return {
+      status: "refreshed",
+    };
   } catch (error: any) {
-    console.log(error);
-    return "error";
+    // console.log("refresh token error = ", error);
+    if (error.response.data.message === "Refresh Token expired") {
+      return {
+        status: "expired",
+        error,
+      };
+    } else {
+      return {
+        status: "error",
+        error,
+      };
+    }
   }
 }
 
@@ -25,8 +36,10 @@ customAxios.interceptors.response.use(
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const result = await refreshAccessToken();
-      if (result === "refreshed") {
+      if (result.status === "refreshed") {
         return customAxios(originalRequest);
+      } else if (result.status === "expired") {
+        return Promise.reject(result.error);
       }
     }
     return Promise.reject(error);
