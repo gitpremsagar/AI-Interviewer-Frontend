@@ -3,10 +3,14 @@
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
 
-export default function ProtectedRoutesLayoutForAuth({
+export default function ProtectedRoutesLayoutForAdmin({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <Provider store={store}>
+      {children}
+    </Provider>
+  );
 }
