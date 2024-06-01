@@ -28,7 +28,7 @@ export default function ProtectedRoutesLayout({
         dispatch(setUser(response.data));
         console.log("response = ", response);
       } catch (error: any) {
-        if (error.response.data.message === "Refresh Token expired") {
+        if (error.response?.data?.message === "Refresh Token expired") {
           router.push("/login");
           // console.log("Access Token Expired");
         } else {
