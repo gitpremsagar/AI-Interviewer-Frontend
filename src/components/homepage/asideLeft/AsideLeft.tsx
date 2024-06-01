@@ -38,7 +38,7 @@ const AsideLeft = () => {
               >
                 <div>
                   <h6 className="text-lg font-bold">
-                    {conversation.conversationId}
+                    {conversation.conversationTitle}
                   </h6>
                 </div>
               </div>

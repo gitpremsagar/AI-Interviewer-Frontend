@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const conversationSchema = z.object({
   conversationId: z.string(),
+  conversationTitle: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   userId: z.string(),
