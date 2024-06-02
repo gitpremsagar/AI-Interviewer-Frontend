@@ -17,8 +17,6 @@ const AddSkills = ({
   const dispatch = useDispatch();
   const skills = useSelector((state: RootState) => state.skill);
 
-  //   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-
   useEffect(() => {
     console.log("selectedSkills", selectedSkills);
   }, [selectedSkills]);

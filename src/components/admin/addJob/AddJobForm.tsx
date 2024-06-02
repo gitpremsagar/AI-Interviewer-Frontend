@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BiLoaderAlt } from "react-icons/bi";
 import customAxios from "@/lib/axiosInterceptor";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,8 +30,6 @@ const formSchema = z.object({
 });
 
 function AddJobForm() {
-  const router = useRouter();
-
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
