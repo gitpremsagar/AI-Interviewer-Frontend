@@ -18,6 +18,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { API_ENDPOINT_FOR_JOB } from "@/lib/constants";
+import AddSkills from "@/components/admin/addJob/AddSkills";
 
 const formSchema = z.object({
   jobTitle: z.string().min(2, { message: "Please enter a valid job title" }),
@@ -33,7 +34,8 @@ function AddJobForm() {
   const router = useRouter();
 
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,8 +49,10 @@ function AddJobForm() {
   });
 
   async function onSubmit(addJobFormData: z.infer<typeof formSchema>) {
+    // attach selected skills to form data
+    addJobFormData.skillIDs = selectedSkills;
     try {
-      setLoading(true);
+      setSubmitting(true);
       setError(null);
 
       const response = await customAxios.post(
@@ -57,20 +61,20 @@ function AddJobForm() {
       );
 
       if (response.status === 200) {
-        router.push("/ai-interview");
+        setSubmitting(false);
         console.log(response.data);
       }
     } catch (error: any) {
-      console.log("error while logging in = ", error);
-      setLoading(false);
-      if (error.response.data.message === "invalid email or password") {
+      console.log("error while creating job = ", error);
+      setSubmitting(false);
+      if (error.response?.data?.message === "invalid email or password") {
         setError("Invalid email or password");
       } else setError("Something went wrong");
     }
   }
 
   return (
-    <div className={`max-w-96 mx-auto mt-20 border rounded-lg shadow-lg p-8`}>
+    <div className={`mx-auto mt-20 border rounded-lg shadow-lg p-8`}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -151,8 +155,13 @@ function AddJobForm() {
             )}
           />
 
-          <Button disabled={loading} type="submit">
-            {loading ? (
+          <AddSkills
+            selectedSkills={selectedSkills}
+            setSelectedSkills={setSelectedSkills}
+          />
+
+          <Button disabled={submitting} type="submit">
+            {submitting ? (
               <>
                 <BiLoaderAlt className="animate-spin" /> Creating Job...
               </>

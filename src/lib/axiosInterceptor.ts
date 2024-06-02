@@ -39,6 +39,8 @@ customAxios.interceptors.response.use(
       if (result.status === "refreshed") {
         return customAxios(originalRequest);
       } else if (result.status === "expired") {
+        // redirect login page
+        window.location.href = "/login";
         return Promise.reject(result.error);
       }
     }
