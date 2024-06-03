@@ -32,8 +32,8 @@ export default function ProtectedRoutesLayout({
           router.push("/login");
           // console.log("Access Token Expired");
         } else {
-          console.error("error = ", error);
-          alert("something went wrong");
+          console.error("this error = ", error);
+          // alert("something went wrong here");//TODO: show a toast error message to the user here
         }
       }
     }
