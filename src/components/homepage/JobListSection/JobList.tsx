@@ -1,12 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { useEffect } from "react";
-import { setJobs } from "@/redux/jobSlice";
-import customAxios from "@/lib/axiosInterceptor";
-import { API_ENDPOINT_FOR_JOB } from "@/lib/constants";
 import { Job } from "@/types/job.type";
 
 const JobListPage: React.FC = () => {
@@ -221,21 +217,9 @@ const JobListPage: React.FC = () => {
   //   },
   // ];
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const jobs = useSelector((state: RootState) => state.job);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await customAxios.get(API_ENDPOINT_FOR_JOB);
-        dispatch(setJobs(response.data));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchJobs();
-  }, []);
 
   return (
     <div className="col-span-8 pt-20 px-10 pb-20">
