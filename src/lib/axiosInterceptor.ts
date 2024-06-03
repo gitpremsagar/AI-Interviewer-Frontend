@@ -10,7 +10,10 @@ async function refreshAccessToken() {
     };
   } catch (error: any) {
     // console.log("refresh token error = ", error);
-    if (error.response?.data?.message === "Refresh Token expired" || error.response?.data?.message === "User not authorised") {
+    if (
+      error.response?.data?.message === "Refresh Token expired" ||
+      error.response?.data?.message === "User not authorised"
+    ) {
       return {
         status: "expired",
         error,
@@ -36,7 +39,7 @@ customAxios.interceptors.response.use(
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const result = await refreshAccessToken();
-      console.log("refresh token result = ", result);
+      // console.log("refresh token result = ", result);
       if (result.status === "refreshed") {
         return customAxios(originalRequest);
       } else if (result.status === "expired") {

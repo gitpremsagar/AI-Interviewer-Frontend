@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { setConversation } from "@/redux/conversationSlice";
 import { RootState } from "@/redux/store";
 
-const AsideLeft = () => {
+const AsideLeftForChat = () => {
   const dispatch = useDispatch();
 
   const conversations = useSelector((state: RootState) => state.conversation);
@@ -16,7 +16,7 @@ const AsideLeft = () => {
     async function fetchConversation() {
       try {
         const response = await customAxios.get(API_ENDPOINT_FOR_CONVERSATION);
-        console.log("fetch conversation response = ", response.data);
+        // console.log("fetch conversation response = ", response.data);
         dispatch(setConversation(response.data));
       } catch (error: any) {
         console.error("error while fetching conversation = ", error);
@@ -50,4 +50,4 @@ const AsideLeft = () => {
   );
 };
 
-export default AsideLeft;
+export default AsideLeftForChat;
