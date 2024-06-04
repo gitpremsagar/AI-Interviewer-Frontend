@@ -16,7 +16,7 @@ const AsideLeftForChat = () => {
     async function fetchConversation() {
       try {
         const response = await customAxios.get(API_ENDPOINT_FOR_CONVERSATION);
-        // console.log("fetch conversation response = ", response.data);
+        console.log("fetch conversation response = ", response.data);
         dispatch(setConversation(response.data));
       } catch (error: any) {
         console.error("error while fetching conversation = ", error);
@@ -31,6 +31,8 @@ const AsideLeftForChat = () => {
         <h1 className="text-xl font-bold text-center">AI Interviewer</h1>
         <menu className="mt-5">
           {conversations?.map((conversation) => {
+            // extract date time, keep only date and time
+            const date = new Date(conversation.createdAt).toLocaleString();
             return (
               <div
                 key={conversation.conversationId}
@@ -38,8 +40,9 @@ const AsideLeftForChat = () => {
               >
                 <div>
                   <h6 className="text-lg font-bold">
-                    {conversation.conversationTitle}
+                    {conversation.job.jobTitle}
                   </h6>
+                  <p className="text-xs text-gray-500">{`${date}`}</p>
                 </div>
               </div>
             );

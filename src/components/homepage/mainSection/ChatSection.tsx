@@ -23,6 +23,8 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
 
   const chatTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!currentJobDetail) {
       return;
@@ -33,11 +35,9 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
           role: "user",
           parts: [
             {
-              text:
-                "Act as an interviewer and take my interview. I'm going to apply for the job of " +
-                currentJobDetail?.jobTitle +
-                ". The job description is " +
-                currentJobDetail?.jobDescription,
+              text: `Act as an interviewer and take my interview. I'm going to apply for the job with following details:
+              jobTitle: ${currentJobDetail?.jobTitle}
+              jobDescription: ${currentJobDetail?.jobDescription}`,
             },
           ],
         },
@@ -72,6 +72,7 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
       const response = await customAxios.post(API_ENDPOINT_FOR_MESSAGE, {
         history: chatHistory,
         message: msg,
+        jobId,
         conversationId: "newConversation",
       });
       setSendingMessage(false);
@@ -91,10 +92,18 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
     }
   };
 
+  // scroll to bottom of chat box
+  useEffect(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, [chatHistory]);
+
   return (
     <ChatSectionContainer>
       <div className="">
-        <div className="px-10 min-h-screen py-32 flex flex-col justify-end">
+        <div
+          ref={chatBoxRef}
+          className="px-10 min-h-screen py-32 flex flex-col justify-end"
+        >
           {chatHistory.map((messageObj, index) => {
             // console.log("msg obj = ", messageObj);
             const role = messageObj.role;
@@ -105,13 +114,13 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
                   role === `user` ? `justify-end` : `justify-start`
                 }`}
               >
-                <div
+                <p
                   className={`p-5 rounded-lg w-fit max-w-[70%] ${
                     role === `user` ? `bg-green-300 ` : `bg-blue-300 `
                   }`}
                 >
                   {messageObj.parts[0].text}
-                </div>
+                </p>
               </div>
             );
           })}
