@@ -6,16 +6,60 @@ import customAxios from "@/lib/axiosInterceptor";
 import { useRef, useEffect, useState, use } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
-import { addMessage } from "@/redux/chatHistorySlice";
+import { addMessage, setFirstChatHistory } from "@/redux/chatHistorySlice";
 import { useRouter } from "next/navigation";
+import { History } from "@/types/history.type";
 
-const MainSection = () => {
+const ChatSection = ({ jobId }: { jobId: String }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const chatHistory = useSelector((state: RootState) => state.chatHistory);
-  const [fetchingResponse, setFetchingResponse] = useState(false);
+  const userDetail = useSelector((state: RootState) => state.user);
+  const jobs = useSelector((state: RootState) => state.job);
+
+  const currentJobId = jobId;
+  const currentJobDetail = jobs.find((job) => job.jobId === currentJobId);
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   const chatTextAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!currentJobDetail) {
+      return;
+    }
+    function buildFirstChatHistory() {
+      const firstChatHistory: History = [
+        {
+          role: "user",
+          parts: [
+            {
+              text:
+                "Act as an interviewer and take my interview. I'm going to apply for the job of " +
+                currentJobDetail?.jobTitle +
+                ". The job description is " +
+                currentJobDetail?.jobDescription,
+            },
+          ],
+        },
+        {
+          role: "model",
+          parts: [{ text: "Ok. Are you ready for the first question?" }],
+        },
+        {
+          role: "user",
+          parts: [{ text: "Yes. I'm Ready." }],
+        },
+        {
+          role: "model",
+          parts: [{ text: "First of all tell me your name." }],
+        },
+      ];
+      return firstChatHistory;
+    }
+
+    const firstChatHistory = buildFirstChatHistory();
+    dispatch(setFirstChatHistory(firstChatHistory));
+  }, [currentJobDetail, router]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,14 +67,14 @@ const MainSection = () => {
     if (!msg) return;
     chatTextAreaRef.current!.value = "";
     dispatch(addMessage({ role: "user", text: msg }));
-    setFetchingResponse(true);
+    setSendingMessage(true);
     try {
       const response = await customAxios.post(API_ENDPOINT_FOR_MESSAGE, {
         history: chatHistory,
         message: msg,
         conversationId: "newConversation",
       });
-      setFetchingResponse(false);
+      setSendingMessage(false);
       dispatch(
         addMessage({ role: "model", text: response.data.geminiResponse })
       );
@@ -48,9 +92,9 @@ const MainSection = () => {
   };
 
   return (
-    <MainSectionContainer>
+    <ChatSectionContainer>
       <div className="">
-        <div className="p-10 min-h-screen py-32 flex flex-col justify-end">
+        <div className="px-10 min-h-screen py-32 flex flex-col justify-end">
           {chatHistory.map((messageObj, index) => {
             // console.log("msg obj = ", messageObj);
             const role = messageObj.role;
@@ -71,7 +115,7 @@ const MainSection = () => {
               </div>
             );
           })}
-          {fetchingResponse && (
+          {sendingMessage && (
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
             </div>
@@ -80,7 +124,6 @@ const MainSection = () => {
         <div className="p-10 bg-gray-600 fixed bottom-0 left-[20%] w-[80%]">
           <form onSubmit={handleSendMessage} className="flex opacity-100">
             <textarea
-              // onChange={handleMessageChange}
               className="border w-full resize-none"
               ref={chatTextAreaRef}
               rows={1}
@@ -89,12 +132,12 @@ const MainSection = () => {
           </form>
         </div>
       </div>
-    </MainSectionContainer>
+    </ChatSectionContainer>
   );
 };
 
-const MainSectionContainer = ({ children }: { children: React.ReactNode }) => {
+const ChatSectionContainer = ({ children }: { children: React.ReactNode }) => {
   return <div className="col-span-8">{children}</div>;
 };
 
-export default MainSection;
+export default ChatSection;
