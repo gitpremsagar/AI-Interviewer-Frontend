@@ -6,11 +6,21 @@ import customAxios from "@/lib/axiosInterceptor";
 import { useRef, useEffect, useState, use } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
-import { addMessage, setFirstChatHistory } from "@/redux/chatHistorySlice";
+import {
+  addMessage,
+  setFirstChatHistory,
+  resetChatHistory,
+} from "@/redux/chatHistorySlice";
 import { useRouter } from "next/navigation";
 import { History } from "@/types/history.type";
 
-const ChatSection = ({ jobId }: { jobId: String }) => {
+const ChatSection = ({
+  jobId,
+  interviewId,
+}: {
+  jobId: String;
+  interviewId?: String;
+}) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const chatHistory = useSelector((state: RootState) => state.chatHistory);
@@ -21,48 +31,49 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
   const currentJobDetail = jobs.find((job) => job.jobId === currentJobId);
   const [sendingMessage, setSendingMessage] = useState(false);
 
-  const [conversationId, setConversationId] = useState("newConversation");
+  const [conversationId, setConversationId] = useState(
+    interviewId ? interviewId : "newConversation"
+  );
+
+  // fetch chat history if conversationId is present
+  useEffect(() => {
+    async function fetchChatHistory() {
+      console.log("fetching chat history, conversationsId = ", conversationId);
+      try {
+        const response = await customAxios.get(
+          API_ENDPOINT_FOR_MESSAGE + `/${conversationId}`
+        );
+        console.log("fetch chat history response = ", response.data);
+        const unformatedHistory = response.data;
+        const formattedHistory: History = unformatedHistory.map(
+          (messageItem: any) => {
+            return {
+              role: messageItem.sender,
+              parts: [
+                {
+                  text: messageItem.message,
+                },
+              ],
+            };
+          }
+        );
+        dispatch(setFirstChatHistory(formattedHistory));
+      } catch (error: any) {
+        console.error("error while fetching chat history = ", error);
+        // alert("something went wrong"); //:TODO replace with shadcn toast
+      }
+    }
+    if (conversationId !== "newConversation") {
+      fetchChatHistory();
+    }
+    return () => {
+      dispatch(resetChatHistory());
+    };
+  }, [router]);
 
   const chatTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
-
-  // //build initial chat history to direct the conversation to interview
-  // useEffect(() => {
-  //   if (!currentJobDetail) {
-  //     return;
-  //   }
-  //   function buildFirstChatHistory() {
-  //     const firstChatHistory: History = [
-  //       {
-  //         role: "user",
-  //         parts: [
-  //           {
-  //             text: `Act as an interviewer and take my interview. I'm going to apply for the job with following details:
-  //             jobTitle: ${currentJobDetail?.jobTitle}
-  //             jobDescription: ${currentJobDetail?.jobDescription}`,
-  //           },
-  //         ],
-  //       },
-  //       {
-  //         role: "model",
-  //         parts: [{ text: "Ok. Are you ready for the first question?" }],
-  //       },
-  //       {
-  //         role: "user",
-  //         parts: [{ text: "Yes. I'm Ready." }],
-  //       },
-  //       {
-  //         role: "model",
-  //         parts: [{ text: "First of all tell me your name." }],
-  //       },
-  //     ];
-  //     return firstChatHistory;
-  //   }
-
-  //   const firstChatHistory = buildFirstChatHistory();
-  //   dispatch(setFirstChatHistory(firstChatHistory));
-  // }, [currentJobDetail, router]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +109,7 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
     }
   };
 
-  // scroll to bottom of chat box
+  // scroll to bottom of chat box on new message
   useEffect(() => {
     window.scrollTo(0, document.body.scrollHeight);
   }, [chatHistory]);
