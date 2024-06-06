@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { setConversation } from "@/redux/conversationSlice";
 import { RootState } from "@/redux/store";
+import Link from "next/link";
 
 const AsideLeftForChat = () => {
   const dispatch = useDispatch();
@@ -38,12 +39,16 @@ const AsideLeftForChat = () => {
                 key={conversation.conversationId}
                 className="flex justify-between p-2"
               >
-                <div>
-                  <h6 className="text-lg font-bold">
-                    {conversation.job.jobTitle}
-                  </h6>
-                  <p className="text-xs text-gray-500">{`${date}`}</p>
-                </div>
+                <Link
+                  href={`/ai-interview/job/${conversation.job.jobId}/${conversation.conversationId}`}
+                >
+                  <div>
+                    <h6 className="text-lg font-bold">
+                      {conversation.job.jobTitle}
+                    </h6>
+                    <p className="text-xs text-red-500">{`${date}`}</p>
+                  </div>
+                </Link>
               </div>
             );
           })}

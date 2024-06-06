@@ -21,45 +21,48 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
   const currentJobDetail = jobs.find((job) => job.jobId === currentJobId);
   const [sendingMessage, setSendingMessage] = useState(false);
 
+  const [conversationId, setConversationId] = useState("newConversation");
+
   const chatTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!currentJobDetail) {
-      return;
-    }
-    function buildFirstChatHistory() {
-      const firstChatHistory: History = [
-        {
-          role: "user",
-          parts: [
-            {
-              text: `Act as an interviewer and take my interview. I'm going to apply for the job with following details:
-              jobTitle: ${currentJobDetail?.jobTitle}
-              jobDescription: ${currentJobDetail?.jobDescription}`,
-            },
-          ],
-        },
-        {
-          role: "model",
-          parts: [{ text: "Ok. Are you ready for the first question?" }],
-        },
-        {
-          role: "user",
-          parts: [{ text: "Yes. I'm Ready." }],
-        },
-        {
-          role: "model",
-          parts: [{ text: "First of all tell me your name." }],
-        },
-      ];
-      return firstChatHistory;
-    }
+  // //build initial chat history to direct the conversation to interview
+  // useEffect(() => {
+  //   if (!currentJobDetail) {
+  //     return;
+  //   }
+  //   function buildFirstChatHistory() {
+  //     const firstChatHistory: History = [
+  //       {
+  //         role: "user",
+  //         parts: [
+  //           {
+  //             text: `Act as an interviewer and take my interview. I'm going to apply for the job with following details:
+  //             jobTitle: ${currentJobDetail?.jobTitle}
+  //             jobDescription: ${currentJobDetail?.jobDescription}`,
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         role: "model",
+  //         parts: [{ text: "Ok. Are you ready for the first question?" }],
+  //       },
+  //       {
+  //         role: "user",
+  //         parts: [{ text: "Yes. I'm Ready." }],
+  //       },
+  //       {
+  //         role: "model",
+  //         parts: [{ text: "First of all tell me your name." }],
+  //       },
+  //     ];
+  //     return firstChatHistory;
+  //   }
 
-    const firstChatHistory = buildFirstChatHistory();
-    dispatch(setFirstChatHistory(firstChatHistory));
-  }, [currentJobDetail, router]);
+  //   const firstChatHistory = buildFirstChatHistory();
+  //   dispatch(setFirstChatHistory(firstChatHistory));
+  // }, [currentJobDetail, router]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,12 +76,15 @@ const ChatSection = ({ jobId }: { jobId: String }) => {
         history: chatHistory,
         message: msg,
         jobId,
-        conversationId: "newConversation",
+        conversationId,
+        jobTitle: currentJobDetail?.jobTitle,
+        jobDescription: currentJobDetail?.jobDescription,
       });
       setSendingMessage(false);
       dispatch(
         addMessage({ role: "model", text: response.data.geminiResponse })
       );
+      setConversationId(response.data.conversationId);
 
       console.log(response.data);
     } catch (error: any) {
