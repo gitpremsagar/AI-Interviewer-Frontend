@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3500";
+const API_BASE_URL = "https://ai-interviewer-backend.vercel.app";
 
 const API_ENDPOINT_FOR_PROMPTS = `${API_BASE_URL}/prompt`;
 

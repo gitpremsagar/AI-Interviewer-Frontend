@@ -29,7 +29,9 @@ const AsideLeftForChat = () => {
   return (
     <div className="col-span-2 bg-gray-800 text-white min-h-screen p-5">
       <div className="fixed">
-        <h1 className="text-xl font-bold text-center">AI Interviewer</h1>
+        <Link href="/ai-interview">
+          <h1 className="text-xl font-bold text-center">AI Interviewer</h1>
+        </Link>
         <menu className="mt-5">
           {conversations?.map((conversation) => {
             // extract date time, keep only date and time

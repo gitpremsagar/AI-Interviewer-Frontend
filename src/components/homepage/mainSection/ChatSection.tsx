@@ -150,11 +150,17 @@ const ChatSection = ({
         <div className="p-10 bg-gray-600 fixed bottom-0 left-[20%] w-[80%]">
           <form onSubmit={handleSendMessage} className="flex opacity-100">
             <textarea
-              className="border w-full resize-none"
+              className="border w-full resize-none px-2 py-1"
               ref={chatTextAreaRef}
               rows={1}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage(e);
+                }
+              }}
             />
-            <Button type="submit">Generate</Button>
+            <Button type="submit">Send</Button>
           </form>
         </div>
       </div>
